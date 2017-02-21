@@ -10,6 +10,8 @@
 
 @interface REInfoCodeController : UIViewController
 
+@property (nonatomic, assign) BOOL bShowBottomBar;
+
 - (instancetype)initWithInfo:(id)info;
 
 @end

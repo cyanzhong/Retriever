@@ -28,8 +28,22 @@ static NSString *const kRERetrieverGitHubURL = @"https://github.com/cyanzhong/Re
     return [([app valueForKeyPath:kREDisplayNameKeyPath] ?: [app valueForKey:kRELocalizedShortNameKey]) description];
 }
 
++ (NSString *)identifierForApp:(id)app {
+    if ([app isKindOfClass:NSClassFromString(@"LSApplicationProxy")]) {
+        return [[self class] bundleIdentifierForApplication:app];
+    }
+    else if ([app isKindOfClass:NSClassFromString(@"LSPlugInKitProxy")]) {
+        return [[self class] pluginIdentifierForPlugin:app];
+    }
+    return @"";
+}
+
 + (NSString *)bundleIdentifierForApplication:(id)app {
     return [app valueForKey:@"bundleIdentifier"];
+}
+
++ (NSString *)pluginIdentifierForPlugin:(id)plugin {
+    return [plugin valueForKey:@"pluginIdentifier"];
 }
 
 + (UIImage *)iconImageForApplication:(id)app {
@@ -43,6 +57,10 @@ static NSString *const kRERetrieverGitHubURL = @"https://github.com/cyanzhong/Re
 
 + (id)applicationForIdentifier:(NSString *)identifier {
     return [@"LSApplicationProxy" invokeClassMethod:@"applicationProxyForIdentifier:" args:identifier, nil];
+}
+
++ (/* LSPlugInKitProxy * */id)plugInForIdentifier:(NSString *)identifier {
+    return [@"LSPlugInKitProxy" invokeClassMethod:@"pluginKitProxyForIdentifier:" args:identifier, nil];
 }
 
 + (NSArray *)applicationsForIdentifiers:(NSArray *)identifiers {
