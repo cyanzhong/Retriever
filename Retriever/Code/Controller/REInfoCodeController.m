@@ -72,18 +72,20 @@ typedef NS_ENUM(NSInteger, REInfoCodeType) {
         make.edges.equalTo(self.view);
     }];
     
-    self.infoBar = [[REAppInfoBar alloc] initWithInfo:self.info];
-    [self.view addSubview:self.infoBar];
-    [self.infoBar mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.bottom.right.equalTo(0);
-        make.height.equalTo(kREAppInfoBarHeight);
-    }];
-    
-    @weakify(self)
-    self.infoBar.openHandler = ^{
-        @strongify(self)
-        [self openApplication];
-    };
+    if (self.bShowBottomBar) {
+        self.infoBar = [[REAppInfoBar alloc] initWithInfo:self.info];
+        [self.view addSubview:self.infoBar];
+        [self.infoBar mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.bottom.right.equalTo(0);
+            make.height.equalTo(kREAppInfoBarHeight);
+        }];
+        
+        @weakify(self)
+        self.infoBar.openHandler = ^{
+            @strongify(self)
+            [self openApplication];
+        };
+    }
     
     [self refresh];
 }
@@ -209,19 +211,27 @@ typedef NS_ENUM(NSInteger, REInfoCodeType) {
 
 - (NSArray<id<UIPreviewActionItem>> *)previewActionItems {
     @weakify(self)
+    NSMutableArray *arrItems = [@[] mutableCopy];
     UIPreviewAction *shareIconAction = [UIPreviewAction actionWithTitle:@"Share Icon" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
         @strongify(self)
         [self shareIcon];
     }];
+    [arrItems addObject:shareIconAction];
+    
     UIPreviewAction *sharePlistAction = [UIPreviewAction actionWithTitle:@"Share Plist" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
         @strongify(self)
         [self sharePlist];
     }];
-    UIPreviewAction *openAction = [UIPreviewAction actionWithTitle:@"Open" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
-        @strongify(self)
-        [self openApplication];
-    }];
-    return @[shareIconAction, sharePlistAction, openAction];
+    [arrItems addObject:sharePlistAction];
+    
+    if ([self.info isKindOfClass:NSClassFromString(@"LSApplicationProxy")]) {
+        UIPreviewAction *openAction = [UIPreviewAction actionWithTitle:@"Open" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
+            @strongify(self)
+            [self openApplication];
+        }];
+        [arrItems addObject:openAction];
+    }
+    return [arrItems copy];
 }
 
 @end
