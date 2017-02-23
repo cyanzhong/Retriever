@@ -29,7 +29,7 @@ typedef NS_ENUM(NSInteger, REListType) {
 @property (nonatomic, readonly) UISegmentedControl *segmentedControl;
 @property (nonatomic, strong) RETableView *tableView;
 @property (nonatomic, strong) UISearchController *searchController;
-@property (nonatomic, strong) NSMutableSet *identifierSet;
+@property (nonatomic, strong) NSMutableDictionary *dictFavorite;
 
 @end
 
@@ -97,9 +97,26 @@ typedef NS_ENUM(NSInteger, REListType) {
         
         NSArray *apps = [REHelper installedApplications];
         NSArray *plugins = [REHelper installedPlugins];
-        NSArray *identifiers = [RECache favouriteAppIdentifiers];
-        self.identifierSet = [NSMutableSet setWithArray:identifiers];
-        NSArray *favourites = [REHelper applicationsForIdentifiers:identifiers];
+        NSDictionary *identifiers = [RECache favouriteAppIdentifiers];
+        self.dictFavorite = [identifiers mutableCopy];
+        __block NSMutableArray *favApps = [NSMutableArray array];
+        [self.dictFavorite enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+            switch ([obj integerValue]) {
+                case REListTypeApp:
+                {
+                    [favApps addObject:[REHelper applicationForIdentifier:key]];
+                }
+                    break;
+                case REListTypePlugin:
+                {
+                    [favApps addObject:[REHelper plugInForIdentifier:key]];
+                }
+                    break;
+                default:
+                    break;
+            }
+        }];
+        NSArray *favourites = [favApps copy];
         NSArray *data;
         
         switch (self.segmentedControl.selectedSegmentIndex) {
@@ -128,7 +145,10 @@ typedef NS_ENUM(NSInteger, REListType) {
 }
 
 - (REInfoCodeController *)codeControllerAtIndexPath:(NSIndexPath *)indexPath {
-    REInfoCodeController *controller = [[REInfoCodeController alloc] initWithInfo:self.filtered[indexPath.row]];
+    id app = self.filtered[indexPath.row];
+    REInfoCodeController *controller = [[REInfoCodeController alloc] initWithInfo:app];
+    controller.bShowBottomBar =
+    [app isKindOfClass:NSClassFromString(@"LSApplicationProxy")];
     return controller;
 }
 
@@ -157,17 +177,18 @@ typedef NS_ENUM(NSInteger, REListType) {
 
 - (NSArray *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    NSString *identifier = [REHelper bundleIdentifierForApplication:self.filtered[indexPath.row]];
-    BOOL like = self.segmentedControl.selectedSegmentIndex != REListTypeFavourite && ![self.identifierSet containsObject:identifier];
+    NSString *identifier = [REHelper identifierForApp:self.filtered[indexPath.row]];
+    BOOL like = self.segmentedControl.selectedSegmentIndex != REListTypeFavourite && !self.dictFavorite[identifier];
     NSString *title = like ? @"Like" : @"Dislike";
     
     @weakify(self)
     void (^actionHandler)(UITableViewRowAction *action, NSIndexPath *indexPath) = ^(UITableViewRowAction *action, NSIndexPath *indexPath) {
         @strongify(self)
         if (like) {
-            [self.identifierSet addObject:identifier];
+            [self.dictFavorite setObject:@(self.segmentedControl.selectedSegmentIndex)
+                                  forKey:identifier];
         } else {
-            [self.identifierSet removeObject:identifier];
+            [self.dictFavorite removeObjectForKey:identifier];
         }
         if (self.segmentedControl.selectedSegmentIndex == REListTypeFavourite) {
             NSMutableArray *list = self.filtered.mutableCopy;
@@ -177,7 +198,7 @@ typedef NS_ENUM(NSInteger, REListType) {
         } else {
             [tableView reloadData];
         }
-        [RECache setFavouriteAppIdentifiers:self.identifierSet.allObjects];
+        [RECache setFavouriteAppIdentifiers:self.dictFavorite];
     };
     
     UITableViewRowAction *action = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal

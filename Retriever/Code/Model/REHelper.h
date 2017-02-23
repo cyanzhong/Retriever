@@ -14,6 +14,8 @@
 
 + (NSArray *)installedPlugins;
 
++ (NSString *)identifierForApp:(id)app;
+
 + (NSString *)bundleIdentifierForApplication:(id)app;
 
 + (NSString *)displayNameForApplication:(id)app;
@@ -23,6 +25,8 @@
 + (UIImage *)iconImageForApplication:(id)app format:(NSInteger)format;
 
 + (id)applicationForIdentifier:(NSString *)identifier;
+
++ (id)plugInForIdentifier:(NSString *)identifier;
 
 + (NSArray *)applicationsForIdentifiers:(NSArray *)identifiers;
 

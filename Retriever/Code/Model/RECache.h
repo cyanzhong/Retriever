@@ -10,8 +10,8 @@
 
 @interface RECache : NSObject
 
-+ (NSArray *)favouriteAppIdentifiers;
++ (NSDictionary *)favouriteAppIdentifiers;
 
-+ (void)setFavouriteAppIdentifiers:(NSArray *)identifiers;
++ (void)setFavouriteAppIdentifiers:(NSDictionary *)identifiers;
 
 @end
