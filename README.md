@@ -6,12 +6,13 @@ Retrieving InfoPlist without Jailbreaking on iOS Devices
 2. iOS: Greater than or equal to iOS 10.0
 
 # Usage
-1. Build & Run this project on your iOS Device
-2. Click app name list on home page
-3. Click `Apps/Plugins` to switch type
-4. Plist file will display as JSON format
-5. Click `JSON/XML/Tree` to toggle display style
-6. Click `Share` button to share Plist file with Share Sheet
+1. Add your Apple Developer account in Project to enable running the app on iOS Device
+2. Build & Run this project on your iOS Device
+3. Click app name list on home page
+4. Click `Apps/Plugins` to switch type
+5. Plist file will display as JSON format
+6. Click `JSON/XML/Tree` to toggle display style
+7. Click `Share` button to share Plist file with Share Sheet
 
 # Screenshots
 
