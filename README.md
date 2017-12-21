@@ -1,3 +1,11 @@
+# ⚠️ WARNING
+
+This project is no longer under maintenance.
+
+Since iOS 11 has removed some sensitive APIs, this project isn't working on it anymore.
+
+Goodbye.
+
 # Retriever
 Retrieving InfoPlist without Jailbreaking on iOS Devices
 
