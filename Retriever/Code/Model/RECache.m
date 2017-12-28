@@ -12,12 +12,12 @@ static NSString *const kRECacheFavouriteAppsKey = @"Favourite";
 
 @implementation RECache
 
-+ (NSArray *)favouriteAppIdentifiers {
-    NSArray *object = [[NSUserDefaults standardUserDefaults] objectForKey:kRECacheFavouriteAppsKey];
-    return object ?: @[];
++ (NSDictionary *)favouriteAppIdentifiers {
+    NSDictionary *object = [[NSUserDefaults standardUserDefaults] objectForKey:kRECacheFavouriteAppsKey];
+    return object ?: @{};
 }
 
-+ (void)setFavouriteAppIdentifiers:(NSArray *)identifiers {
++ (void)setFavouriteAppIdentifiers:(NSDictionary *)identifiers {
     [[NSUserDefaults standardUserDefaults] setObject:identifiers forKey:kRECacheFavouriteAppsKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
